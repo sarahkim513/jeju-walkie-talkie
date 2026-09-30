@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>제주항공 객실훈련팀 소통 워키토키</title>
+  <!-- Tailwind CSS & Lucide Icons & Canvas Confetti -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    
+    /* 플라이트산스 / Pretendard 브랜드 글씨체 적용 */
+    body, button, input, select, textarea {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      letter-spacing: -0.02em;
+    }
+    
+    .jeju-orange { color: #FF5000; }
+    .bg-jeju-orange { background-color: #FF5000; }
+    .border-jeju-orange { border-color: #FF5000; }
+    
+    /* Walkie Talkie Display Font */
+    @font-face {
+      font-family: 'DigitalFont';
+      src: url('https://fonts.cdnfonts.com/s/18151/DS-DIGI.TTF') format('truetype');
+    }
+    .digital-lcd {
+      font-family: 'DigitalFont', monospace, sans-serif;
+      letter-spacing: 2px;
+    }
+
+    /* Jar Glass Animation & Style */
+    .jar-container {
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(8px);
+      border: 4px solid rgba(255, 255, 255, 0.8);
+      border-top: none;
+      border-radius: 0 0 60px 60px;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.08), 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .jar-rim {
+      border: 4px solid rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    @keyframes dropMarble {
+      0% { transform: translateY(-120px) scale(0.3); opacity: 0; }
+      70% { transform: translateY(10px) scale(1.1); opacity: 1; }
+      100% { transform: translateY(0) scale(1); }
+    }
+    .marble-anim {
+      animation: dropMarble 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    /* Speaker Grille Pattern */
+    .speaker-grille {
+      background-image: radial-gradient(#374151 20%, transparent 20%);
+      background-size: 8px 8px;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col items-center justify-start p-2 sm:p-6">
+
+  <!-- ==================== 1. REALISTIC WALKIE-TALKIE LOGIN SCREEN ==================== -->
+  <div id="loginScreen" class="w-full max-w-md my-auto flex flex-col items-center transition-all duration-500 z-50">
+    
+    <!-- Walkie-Talkie Top Antenna & Knobs -->
+    <div class="w-full flex justify-between items-end px-10 -mb-2">
+      <!-- Left Knob (Volume/Power) -->
+      <div class="flex flex-col items-center">
+        <div class="w-6 h-8 bg-gray-700 rounded-t-md border-b-2 border-gray-900 shadow-md flex flex-col justify-between p-0.5">
+          <div class="w-full h-1 bg-gray-500 rounded"></div>
+          <div class="w-full h-1 bg-gray-500 rounded"></div>
+        </div>
+        <span class="text-[10px] font-bold text-gray-500 mt-0.5">PWR/VOL</span>
+      </div>
+
+      <!-- Center Antenna -->
+      <div class="flex flex-col items-center -mb-1">
+        <div class="w-4 h-20 bg-gradient-to-r from-gray-800 via-gray-600 to-gray-900 rounded-t-lg shadow-lg relative">
+          <div class="w-6 h-2 bg-gray-900 rounded-full absolute -bottom-1 -left-1"></div>
+        </div>
+      </div>
+
+      <!-- Right Knob (Channel) -->
+      <div class="flex flex-col items-center">
+        <div class="w-7 h-9 bg-gray-700 rounded-t-md border-b-2 border-gray-900 shadow-md flex flex-col justify-between p-0.5">
+          <div class="w-full h-1 bg-jeju-orange rounded"></div>
+          <div class="w-full h-1 bg-gray-500 rounded"></div>
+        </div>
+        <span class="text-[10px] font-bold text-gray-500 mt-0.5">CH</span>
+      </div>
+    </div>
+
+    <!-- Walkie Talkie Main Body -->
+    <div class="w-full bg-gray-800 rounded-3xl p-6 shadow-2xl border-4 border-gray-700 relative overflow-hidden flex flex-col items-center">
+      
+      <!-- Side PTT Button Visual Effect -->
+      <div class="absolute -left-3 top-28 w-3 h-20 bg-jeju-orange rounded-l-md border-r-2 border-orange-700 shadow-md flex items-center justify-center">
+        <span class="text-[9px] text-white font-bold rotate-90 tracking-tighter">PTT</span>
+      </div>
+
+      <!-- Top LED Status & Frequency Indicator -->
+      <div class="w-full flex justify-between items-center mb-3 px-2">
+        <div class="flex items-center space-x-2">
+          <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_#22c55e]"></div>
+          <span class="text-xs font-mono text-green-400">TX/RX READY</span>
+        </div>
+        <span class="text-xs font-mono text-gray-400">JEJU AIR CABIN</span>
+      </div>
+
+      <!-- LCD Frequency Display Panel -->
+      <div class="w-full bg-emerald-950 border-4 border-gray-900 rounded-xl p-4 shadow-inner mb-6 text-emerald-400 flex flex-col justify-between relative">
+        <div class="flex justify-between items-center text-xs font-mono text-emerald-600">
+          <span>SIGNAL: ▮▮▮▮█</span>
+          <span id="lcdBattery">BAT: 99%</span>
+        </div>
+        <div class="text-center my-2">
+          <div class="text-3xl font-bold digital-lcd tracking-widest text-emerald-300">CH-01 | 737.800 MHz</div>
+          <div class="text-xs mt-1 text-emerald-500">객실훈련팀 전용 무전 소통 채널</div>
+        </div>
+        <div class="flex justify-between text-[11px] text-emerald-600 border-t border-emerald-900/60 pt-1 mt-1">
+          <span>SQUELCH: AUTO</span>
+          <span>MODE: FM</span>
+        </div>
+      </div>
+
+      <!-- Speaker Grille -->
+      <div class="w-full h-12 speaker-grille bg-gray-900/80 rounded-lg border border-gray-700 mb-6 flex items-center justify-center">
+        <div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest bg-gray-800/90 px-3 py-0.5 rounded-full border border-gray-700">
+          High Quality Transceiver
+        </div>
+      </div>
+
+      <!-- Login Form Inside Radio Body -->
+      <div class="w-full bg-gray-900/90 rounded-2xl p-5 border border-gray-700 shadow-lg">
+        <h2 class="text-center text-lg font-bold text-white mb-1 flex items-center justify-center gap-2">
+          <i data-lucide="radio" class="w-5 h-5 text-jeju-orange"></i>
+          소통 워키토키 접속
+        </h2>
+        <p class="text-xs text-center text-gray-400 mb-4">본인의 이름을 선택하고 비밀번호를 입력하세요.</p>
+
+        <form id="loginForm" class="space-y-4" onsubmit="handleLogin(event)">
+          <div>
+            <label class="block text-xs font-medium text-gray-300 mb-1">팀원 이름</label>
+            <select id="loginUserSelect" required class="w-full bg-gray-800 border border-gray-600 text-white text-sm rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500 outline-none">
+              <!-- Populated dynamically with default placeholder -->
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-300 mb-1">비밀번호 (초기: 0000)</label>
+            <input type="password" id="loginPinInput" maxlength="10" required placeholder="비밀번호 입력" class="w-full bg-gray-800 border border-gray-600 text-white text-sm rounded-lg p-2.5 text-center tracking-widest focus:ring-2 focus:ring-orange-500 outline-none">
+          </div>
+
+          <button type="submit" class="w-full bg-jeju-orange hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow-lg flex items-center justify-center gap-2 transition duration-200 active:scale-95">
+            <i data-lucide="mic" class="w-5 h-5"></i>
+            무전 채널 주파수 맞추기 (로그인)
+          </button>
+        </form>
+      </div>
+
+      <!-- Bottom Audio Effect Toggle -->
+      <div class="mt-4 flex items-center gap-2 text-xs text-gray-400">
+        <input type="checkbox" id="soundToggle" checked class="rounded accent-orange-500">
+        <label for="soundToggle" class="cursor-pointer select-none">무전 송수신 효과음 활성화</label>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ==================== 2. MAIN APP DASHBOARD ==================== -->
+  <div id="mainDashboard" class="hidden w-full max-w-5xl flex-col min-h-screen">
+    
+    <!-- Top Header -->
+    <header class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-6 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="bg-jeju-orange text-white p-2.5 rounded-xl shadow-md">
+          <i data-lucide="radio" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-extrabold text-gray-900 tracking-tight">제주항공 객실훈련팀</h1>
+            <span class="bg-orange-100 text-jeju-orange text-xs px-2.5 py-0.5 rounded-full font-bold">소통 워키토키 737.800MHz</span>
+          </div>
+          <p class="text-xs text-gray-500">서로 격려하고 즐겁게 소통하는 우리만의 무전 공간</p>
+        </div>
+      </div>
+
+      <!-- User Profile Badge & Actions -->
+      <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-2 bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200">
+          <div class="w-7 h-7 rounded-full bg-jeju-orange text-white flex items-center justify-center font-bold text-xs" id="currentUserAvatar">
+            김
+          </div>
+          <span class="text-sm font-semibold text-gray-700" id="currentUserName">김사라</span>
+        </div>
+
+        <button onclick="openPasswordModal()" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium px-3 py-2 rounded-lg transition">
+          비번 변경
+        </button>
+
+        <!-- Admin Only Member Management Button -->
+        <button id="adminMemberBtn" onclick="openAdminModal()" class="hidden text-xs bg-purple-600 hover:bg-purple-700 text-white font-medium px-3 py-2 rounded-lg transition flex items-center gap-1">
+          <i data-lucide="settings" class="w-3.5 h-3.5"></i> 팀원 관리
+        </button>
+
+        <button onclick="handleLogout()" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 font-medium px-3 py-2 rounded-lg transition">
+          로그아웃
+        </button>
+      </div>
+    </header>
+
+    <!-- Tab Navigation Header -->
+    <nav class="bg-white rounded-xl shadow-sm border border-gray-200 p-1.5 mb-6 flex overflow-x-auto gap-1">
+      <button onclick="switchTab('jar')" id="tabBtn-jar" class="tab-btn flex-1 min-w-[120px] py-2.5 px-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition">
+        <i data-lucide="heart-handshake" class="w-4 h-4"></i> 감사항아리
+      </button>
+      <button onclick="switchTab('members')" id="tabBtn-members" class="tab-btn flex-1 min-w-[120px] py-2.5 px-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition">
+        <i data-lucide="users" class="w-4 h-4"></i> 팀원 자기소개
+      </button>
+      <button onclick="switchTab('manitto')" id="tabBtn-manitto" class="tab-btn flex-1 min-w-[120px] py-2.5 px-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition">
+        <i data-lucide="gift" class="w-4 h-4"></i> 비밀 마니또 🎁
+      </button>
+      <button onclick="switchTab('forum')" id="tabBtn-forum" class="tab-btn flex-1 min-w-[120px] py-2.5 px-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition">
+        <i data-lucide="message-square" class="w-4 h-4"></i> 자유 익명게시판
+      </button>
+      <button onclick="switchTab('counsel')" id="tabBtn-counsel" class="tab-btn flex-1 min-w-[120px] py-2.5 px-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition">
+        <i data-lucide="shield-alert" class="w-4 h-4"></i> 비밀 고민상담소
+      </button>
+    </nav>
+
+
+    <!-- TAB 1: 감사항아리 (Gratitude Jar) -->
+    <div id="tabContent-jar" class="tab-content hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Interactive Animated Gratitude Jar Graphic Column -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 flex flex-col items-center justify-between">
+          <div class="text-center mb-2">
+            <h3 class="text-lg font-bold text-gray-800 flex items-center justify-center gap-2">
+              <i data-lucide="sparkles" class="w-5 h-5 text-amber-500"></i> 마음의 감사항아리
+            </h3>
+            <p class="text-xs text-gray-500 mt-1">우리 팀원들의 따뜻한 마음 구슬이 차곡차곡 쌓이고 있어요!</p>
+          </div>
+
+          <!-- Glass Jar Visual Graphic -->
+          <div class="w-full max-w-[260px] my-4 relative flex flex-col items-center">
+            <!-- Rim -->
+            <div class="w-32 h-6 jar-rim shadow-sm z-10"></div>
+            <!-- Body Container -->
+            <div id="jarGraphic" class="w-full h-64 jar-container relative overflow-hidden flex flex-wrap-reverse content-start p-3 gap-2 justify-center">
+              <!-- Animated Marbles Render Here -->
+            </div>
+          </div>
+
+          <div class="w-full bg-orange-50 rounded-xl p-3 border border-orange-100 text-xs text-orange-800 flex justify-around text-center">
+            <div>
+              <span class="block font-extrabold text-base text-jeju-orange" id="jarCountTotal">0</span>
+              <span>총 마음구슬</span>
+            </div>
+            <div class="border-r border-orange-200"></div>
+            <div>
+              <span class="block font-extrabold text-base text-jeju-orange" id="jarCountMy">0</span>
+              <span>내가 보낸 구슬</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gratitude Message Form & Feed -->
+        <div class="lg:col-span-2 space-y-6">
+          
+          <!-- Input Form -->
+          <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+            <h3 class="text-md font-bold text-gray-800 mb-3 flex items-center gap-2">
+              <i data-lucide="plus-circle" class="w-5 h-5 text-jeju-orange"></i> 감사 마음 전달하기
+            </h3>
+            <form onsubmit="handleAddJarMsg(event)" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-600 mb-1">카테고리 (구슬 색상)</label>
+                  <select id="jarCategory" class="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500 outline-none">
+                    <option value="훈련센터">🏢 훈련센터 (주황 구슬)</option>
+                    <option value="팀원 전체">👥 팀원 전체 (파랑 구슬)</option>
+                    <option value="팀원 개인">👤 팀원 개인 (분홍 구슬)</option>
+                    <option value="일상">☕ 일상/소소한 감사 (초록 구슬)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-600 mb-1">대상 팀원 (선택)</label>
+                  <select id="jarTargetUser" class="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500 outline-none">
+                    <option value="전체">전체 대상</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <textarea id="jarText" rows="3" required placeholder="팀원에게 전하고 싶은 따뜻한 감사나 칭찬을 작성해 주세요." class="w-full text-sm border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-orange-500 outline-none resize-none"></textarea>
+              </div>
+
+              <!-- Photo Attachment Preview -->
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">사진 첨부 (선택)</label>
+                <input type="file" id="jarPhotoInput" accept="image/*" onchange="previewJarImage(this)" class="text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-orange-50 file:text-jeju-orange hover:file:bg-orange-100">
+                <div id="jarImagePreview" class="mt-2 hidden relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200">
+                  <img src="" id="jarImgTag" class="w-full h-full object-cover">
+                  <button type="button" onclick="removeJarImage()" class="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+                </div>
+              </div>
+
+              <div class="flex justify-end">
+                <button type="submit" class="bg-jeju-orange hover:bg-orange-600 text-white font-bold px-6 py-2.5 rounded-lg text-sm shadow flex items-center gap-2 transition active:scale-95">
+                  <i data-lucide="send" class="w-4 h-4"></i> 항아리에 감사 구슬 넣기
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Feed List -->
+          <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+            <h3 class="text-md font-bold text-gray-800 mb-4 flex items-center justify-between">
+              <span>💌 도착한 감사 구슬 목록</span>
+              <span class="text-xs text-gray-400 font-normal">최신순 정렬</span>
+            </h3>
+            <div id="jarFeedList" class="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- TAB 2: 팀원 자기소개 (Team Members Profiles) -->
+    <div id="tabContent-members" class="tab-content hidden space-y-6">
+      
+      <!-- Top Playlist & Search Bar -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <i data-lucide="users" class="w-5 h-5 text-jeju-orange"></i> 객실훈련팀 식구들 (총 <span id="memberCountHeader">16</span>명)
+          </h2>
+          <p class="text-xs text-gray-500 mt-0.5">서로에 대해 더 잘 알아가는 프로필 카드입니다. (※ 원하지 않는 항목은 빈칸으로 두셔도 됩니다)</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+          <!-- Youtube Playlist Button -->
+          <a href="https://www.youtube.com/results?search_query=제주항공+객실훈련팀+추천곡+플레이리스트" target="_blank" rel="noopener noreferrer" class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow flex items-center gap-2 transition">
+            <i data-lucide="play-circle" class="w-4 h-4"></i> 🎧 전체 팀원 추천곡 연속 재생 (YouTube)
+          </a>
+
+          <!-- Search Input -->
+          <div class="relative flex-1 md:w-48">
+            <input type="text" id="memberSearchInput" oninput="renderMemberCards()" placeholder="이름/MBTI 검색..." class="w-full text-xs bg-gray-100 border border-gray-200 rounded-xl pl-8 pr-3 py-2 focus:ring-2 focus:ring-orange-500 outline-none">
+            <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Member Grid Container (16 Members) -->
+      <div id="memberGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+
+    <!-- TAB 3: 비밀 마니또 🎁 (Secret Manitto) -->
+    <div id="tabContent-manitto" class="tab-content hidden space-y-6">
+      
+      <!-- Manitto Period & My Target Info Banner -->
+      <div class="bg-gradient-to-r from-orange-500 via-amber-500 to-amber-600 text-white rounded-2xl p-6 shadow-md relative overflow-hidden">
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider">Secret Manitto Season</span>
+            <h2 class="text-xl font-extrabold mt-2 flex items-center gap-2">
+              🎁 2026 하반기 비밀 마니또
+            </h2>
+            <p class="text-xs text-orange-100 mt-1">
+              운영 기간: <b>2026.09.29 ~ 2026.12.31</b> (이후 1분기 단위 자동 순환)
+            </p>
+          </div>
+
+          <!-- My Assigned Manitto Card -->
+          <div class="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 min-w-[220px] text-center">
+            <span class="text-xs text-orange-100 block mb-1">내가 수호천사가 되어줄 마니또</span>
+            <div id="myManittoTargetName" class="text-2xl font-black text-yellow-200 tracking-wider">
+              ???
+            </div>
+            <button onclick="revealMyManittoTarget()" id="revealBtn" class="mt-2 text-xs bg-white text-jeju-orange font-bold px-3 py-1 rounded-full shadow hover:bg-orange-50 transition">
+              👀 마니또 확인하기
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Secret Message Send Form & Received Messages -->
+        <div class="space-y-6">
+          <!-- Send Form -->
+          <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+            <h3 class="text-md font-bold text-gray-800 mb-3 flex items-center gap-2">
+              <i data-lucide="send" class="w-5 h-5 text-jeju-orange"></i> 내 마니또에게 익명 응원 보내기
+            </h3>
+            <form onsubmit="handleSendManittoMsg(event)" class="space-y-3">
+              <textarea id="manittoMsgInput" rows="3" required placeholder="내 마니또에게만 전달되는 비밀 응원 메시지입니다. (상대방에겐 익명으로 전달됩니다)" class="w-full text-sm border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-orange-500 outline-none resize-none"></textarea>
+              <div class="flex justify-end">
+                <button type="submit" class="bg-jeju-orange hover:bg-orange-600 text-white font-bold px-5 py-2 rounded-lg text-xs shadow transition active:scale-95">
+                  비밀 응원 전달
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- My Manitto Inbox -->
+          <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+            <h3 class="text-md font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <i data-lucide="inbox" class="w-5 h-5 text-amber-500"></i> 나를 위한 수호천사의 비밀 편지함
+            </h3>
+            <div id="manittoInboxList" class="space-y-3 max-h-80 overflow-y-auto">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Public Praise & Warm Moments Board -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-md font-bold text-gray-800 flex items-center gap-2">
+                <i data-lucide="camera" class="w-5 h-5 text-pink-500"></i> 팀원 칭찬 &amp; 훈훈한 순간 📸
+              </h3>
+              <button onclick="openManittoPhotoModal()" class="text-xs bg-pink-50 hover:bg-pink-100 text-pink-600 font-bold px-3 py-1.5 rounded-lg border border-pink-200 transition">
+                + 사진/칭찬 올리기
+              </button>
+            </div>
+            
+            <div id="manittoPhotoGallery" class="grid grid-cols-2 gap-3 max-h-[480px] overflow-y-auto pr-1">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- TAB 4: 자유 익명게시판 (Anonymous Forum) -->
+    <div id="tabContent-forum" class="tab-content hidden space-y-6">
+      
+      <!-- New Post Form -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+        <h3 class="text-md font-bold text-gray-800 mb-3 flex items-center gap-2">
+          <i data-lucide="edit-3" class="w-5 h-5 text-jeju-orange"></i> 자유로이 의견 나누기 (완전 익명)
+        </h3>
+        <form onsubmit="handleCreateForumPost(event)" class="space-y-3">
+          <input type="text" id="forumTitleInput" required placeholder="제목을 입력하세요..." class="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500 outline-none">
+          <textarea id="forumContentInput" rows="3" required placeholder="솔직하고 자유로운 이야기, 제안, 건의사항을 남겨주세요." class="w-full text-sm border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-orange-500 outline-none resize-none"></textarea>
+          <div class="flex justify-end">
+            <button type="submit" class="bg-jeju-orange hover:bg-orange-600 text-white font-bold px-5 py-2 rounded-lg text-xs shadow transition active:scale-95">
+              익명 글 등록
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Forum Posts Feed -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+        <h3 class="text-md font-bold text-gray-800 mb-4 flex items-center justify-between">
+          <span>💬 게시글 목록</span>
+          <span class="text-xs text-gray-400 font-normal">자유로운 소통 공간</span>
+        </h3>
+
+        <div id="forumPostList" class="space-y-6">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- TAB 5: 비밀 고민상담소 (Secret Counseling) -->
+    <div id="tabContent-counsel" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+        <div class="border-b border-gray-100 pb-4 mb-6">
+          <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600"></i> 비밀 고민상담소
+          </h2>
+          <p class="text-xs text-gray-500 mt-1">
+            업무, 진로, 인간관계 등 마음속 깊은 고민을 원하는 상대에게 안전하게 전해보세요. (선택한 수신인만 열람 가능)
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          <!-- Send Form -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-bold text-gray-700">1:1 비밀 상담 보내기</h3>
+            <form onsubmit="handleSendCounsel(event)" class="space-y-3">
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">상담을 전할 대상 팀원 (수신인)</label>
+                <select id="counselTargetSelect" class="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none">
+                  <!-- All 16 Members populated dynamically -->
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">고민 내용</label>
+                <textarea id="counselTextInput" rows="5" required placeholder="비밀이 보장됩니다. 솔직한 고민과 이야기를 남겨주세요." class="w-full text-sm border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-500 outline-none resize-none"></textarea>
+              </div>
+
+              <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-xs shadow transition active:scale-95 flex items-center justify-center gap-2">
+                <i data-lucide="lock" class="w-4 h-4"></i> 암호화 비밀 메시지 발송
+              </button>
+            </form>
+          </div>
+
+          <!-- My Secret Inbox (Only visible if sent TO me) -->
+          <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+            <h3 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+              <i data-lucide="lock" class="w-4 h-4 text-emerald-600"></i> 나에게 도착한 비밀 상담함
+            </h3>
+            <div id="counselInboxList" class="space-y-3 max-h-80 overflow-y-auto">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- 1. Password Change Modal -->
+  <div id="passwordModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+      <h3 class="text-md font-bold text-gray-800 flex items-center gap-2">
+        <i data-lucide="key" class="w-5 h-5 text-jeju-orange"></i> 비밀번호 변경
+      </h3>
+      <form onsubmit="handleChangePassword(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">현재 비밀번호</label>
+          <input type="password" id="currPinInput" required class="w-full text-sm border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-orange-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">새로운 비밀번호</label>
+          <input type="password" id="newPinInput" required class="w-full text-sm border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-orange-500">
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closePasswordModal()" class="px-4 py-2 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg">취소</button>
+          <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-jeju-orange rounded-lg">변경하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Admin Member Management Modal (김사라, 조제민 전용) -->
+  <div id="adminModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-md font-bold text-gray-800 flex items-center gap-2">
+          <i data-lucide="shield" class="w-5 h-5 text-purple-600"></i> 팀원 명단 관리 (김사라/조제민 권한)
+        </h3>
+        <button onclick="closeAdminModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <!-- Add New Member Form -->
+      <form onsubmit="handleAddMember(event)" class="flex gap-2">
+        <input type="text" id="newMemberNameInput" placeholder="신규 팀원 이름" required class="flex-1 text-sm border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-purple-500 outline-none">
+        <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 py-2 rounded-lg text-xs">
+          추가
+        </button>
+      </form>
+
+      <!-- Existing Member List -->
+      <div id="adminMemberList" class="space-y-2 max-h-60 overflow-y-auto border border-gray-100 rounded-xl p-2">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Edit Profile Modal -->
+  <div id="editProfileModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto space-y-4">
+      <div class="flex justify-between items-center border-b pb-3">
+        <div>
+          <h3 class="text-md font-bold text-gray-800 flex items-center gap-2">
+            <i data-lucide="user-cog" class="w-5 h-5 text-jeju-orange"></i> 내 프로필 카드 수정
+          </h3>
+          <p class="text-xs text-gray-400 mt-0.5">※ 원하지 않는 항목은 빈칸으로 작성하셔도 됩니다.</p>
+        </div>
+        <button onclick="closeEditProfileModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <form onsubmit="handleSaveProfile(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">프로필 사진</label>
+          <input type="file" id="editProfilePicInput" accept="image/*" class="text-xs text-gray-500">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">나이</label>
+            <input type="text" id="editAge" placeholder="예: 30" class="w-full text-xs border border-gray-300 rounded-lg p-2">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">MBTI</label>
+            <input type="text" id="editMbti" placeholder="예: ENFP" class="w-full text-xs border border-gray-300 rounded-lg p-2">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">고향</label>
+            <input type="text" id="editHometown" placeholder="예: 서울" class="w-full text-xs border border-gray-300 rounded-lg p-2">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">거주지</label>
+            <input type="text" id="editResidence" placeholder="예: 강서구" class="w-full text-xs border border-gray-300 rounded-lg p-2">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">좋아하는 음식</label>
+          <input type="text" id="editFood" placeholder="예: 떡볶이, 초밥" class="w-full text-xs border border-gray-300 rounded-lg p-2">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">소중한 사람</label>
+          <input type="text" id="editPreciousPerson" placeholder="예: 우리 가족, 귀여운 반려견" class="w-full text-xs border border-gray-300 rounded-lg p-2">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">책 / 문구</label>
+          <input type="text" id="editBookQuote" placeholder="예: 감명 깊게 읽은 책이나 좌우명" class="w-full text-xs border border-gray-300 rounded-lg p-2">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">🎵 추천 노래 (유튜브 연동)</label>
+          <input type="text" id="editSong" placeholder="가수 - 노래제목" class="w-full text-xs border border-gray-300 rounded-lg p-2">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">훈련팀에 바라는 점</label>
+          <textarea id="editWishToTeam" rows="2" placeholder="팀에 바라는 마음을 자유롭게 남겨주세요." class="w-full text-xs border border-gray-300 rounded-lg p-2 resize-none"></textarea>
+        </div>
+        
+        <!-- 동적 질문 추가 구역 -->
+        <div class="border-t pt-3">
+          <div class="flex justify-between items-center mb-2">
+            <label class="block text-xs font-bold text-orange-600">✨ 기타 내가 답변하고 싶은 질문 추가</label>
+            <button type="button" onclick="addCustomFieldInput()" class="text-[11px] bg-orange-100 hover:bg-orange-200 text-jeju-orange font-bold px-2.5 py-1 rounded-full transition">+ 항목 추가</button>
+          </div>
+          <div id="customFieldsContainer" class="space-y-2">
+            <!-- Dynamic Custom Q&A Inputs Render Here -->
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeEditProfileModal()" class="px-4 py-2 text-xs text-gray-600 bg-gray-100 rounded-lg">취소</button>
+          <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-jeju-orange rounded-lg">저장하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Manitto Photo Upload Modal -->
+  <div id="manittoPhotoModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+      <h3 class="text-md font-bold text-gray-800 flex items-center gap-2">
+        <i data-lucide="camera" class="w-5 h-5 text-pink-500"></i> 팀원 칭찬 &amp; 훈훈한 순간 업로드
+      </h3>
+      <form onsubmit="handleAddManittoPhoto(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">사진 선택</label>
+          <input type="file" id="manittoPhotoFileInput" accept="image/*" required class="text-xs text-gray-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">한줄 설명 / 칭찬 문구</label>
+          <input type="text" id="manittoPhotoCaption" required placeholder="훈훈한 팀원의 모습을 자랑해주세요!" class="w-full text-xs border border-gray-300 rounded-lg p-2">
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeManittoPhotoModal()" class="px-4 py-2 text-xs text-gray-600 bg-gray-100 rounded-lg">취소</button>
+          <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-pink-500 rounded-lg">업로드</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script>
+    // 1. Initial 16 Team Members List (Exact Match)
+    const INITIAL_MEMBERS = [
+      "강신욱", "김사라", "김연희", "박민지A", "유재진", "윤준영", "오아현", "이광석",
+      "이동찬", "이은비", "이지애A", "임청", "조제민", "지혜진", "한재민", "현윤선"
+    ];
+
+    // Admin Users List (Only these 2 can manage members)
+    const ADMIN_USERS = ["김사라", "조제민"];
+
+    // App State Management
+    let state = {
+      members: [],
+      passwords: {},
+      currentUser: null,
+      gratitudeJar: [],
+      profiles: {},
+      manittoPairs: {},
+      manittoMsgs: [],
+      manittoPhotos: [],
+      forumPosts: [],
+      counselMsgs: [],
+      currentTab: 'jar',
+      tempJarPhoto: null
+    };
+
+    // Audio Sound Effect (Radio Beep)
+    function playBeep() {
+      const toggle = document.getElementById('soundToggle');
+      if (toggle && !toggle.checked) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.15);
+      } catch (e) {}
+    }
+
+    // Load LocalStorage Data or Set Initial
+    function initData() {
+      const savedMembers = localStorage.getItem('ja_members');
+      state.members = savedMembers ? JSON.parse(savedMembers) : [...INITIAL_MEMBERS];
+
+      const savedPw = localStorage.getItem('ja_pw');
+      state.passwords = savedPw ? JSON.parse(savedPw) : {};
+      state.members.forEach(m => {
+        if (!state.passwords[m]) state.passwords[m] = "0000";
+      });
+
+      const savedJar = localStorage.getItem('ja_jar');
+      state.gratitudeJar = savedJar ? JSON.parse(savedJar) : [
+        { id: 1, sender: "조제민", category: "훈련센터", target: "전체", text: "상반기 비상탈출 훈련 모의평가 무사히 마친 모든 분들 고생 많으셨습니다!", photo: "", date: "2026.09.28" },
+        { id: 2, sender: "김사라", category: "팀원 개인", target: "이지애A", text: "신입 교관 오리엔테이션 자료 깔끔하게 정돈해줘서 고마워요!", photo: "", date: "2026.09.29" }
+      ];
+
+      const savedProfiles = localStorage.getItem('ja_profiles');
+      state.profiles = savedProfiles ? JSON.parse(savedProfiles) : {};
+      state.members.forEach(m => {
+        if (!state.profiles[m]) {
+          state.profiles[m] = {
+            age: "",
+            mbti: "ENFP",
+            hometown: "",
+            residence: "",
+            food: "",
+            preciousPerson: "",
+            bookQuote: "즐겁게 교육하고 함께 성장하자!",
+            song: "DAY6 - 한 페이지가 될 수 있게",
+            wishToTeam: "",
+            customFields: [],
+            photo: ""
+          };
+        }
+      });
+
+      // Manitto Pairing Logic (Deterministic cyclic shift for simplicity)
+      generateManittoPairs();
+
+      const savedMNotices = localStorage.getItem('ja_manitto_msgs');
+      state.manittoMsgs = savedMNotices ? JSON.parse(savedMNotices) : [];
+
+      const savedMPhotos = localStorage.getItem('ja_manitto_photos');
+      state.manittoPhotos = savedMPhotos ? JSON.parse(savedMPhotos) : [];
+
+      const savedForum = localStorage.getItem('ja_forum');
+      state.forumPosts = savedForum ? JSON.parse(savedForum) : [
+        { id: 1, title: "훈련 교안 개정 관련 소소한 제안", content: "최근 개정된 안전 수칙 내용을 카드뉴스 형식으로 만들어 교관실 입구에 붙여두면 좋을 것 같아요!", likes: 5, comments: [], date: "2026.09.29" }
+      ];
+
+      const savedCounsel = localStorage.getItem('ja_counsel');
+      state.counselMsgs = savedCounsel ? JSON.parse(savedCounsel) : [];
+
+      populateLoginDropdown();
+    }
+
+    function generateManittoPairs() {
+      state.manittoPairs = {};
+      const len = state.members.length;
+      state.members.forEach((m, idx) => {
+        state.manittoPairs[m] = state.members[(idx + 1) % len];
+      });
+    }
+
+    function saveState() {
+      localStorage.setItem('ja_members', JSON.stringify(state.members));
+      localStorage.setItem('ja_pw', JSON.stringify(state.passwords));
+      localStorage.setItem('ja_jar', JSON.stringify(state.gratitudeJar));
+      localStorage.setItem('ja_profiles', JSON.stringify(state.profiles));
+      localStorage.setItem('ja_manitto_msgs', JSON.stringify(state.manittoMsgs));
+      localStorage.setItem('ja_manitto_photos', JSON.stringify(state.manittoPhotos));
+      localStorage.setItem('ja_forum', JSON.stringify(state.forumPosts));
+      localStorage.setItem('ja_counsel', JSON.stringify(state.counselMsgs));
+    }
+
+    function populateLoginDropdown() {
+      const select = document.getElementById('loginUserSelect');
+      select.innerHTML = '';
+
+      // Default Placeholder
+      const placeholderOpt = document.createElement('option');
+      placeholderOpt.value = "";
+      placeholderOpt.textContent = "본인의 이름을 클릭하세요";
+      placeholderOpt.disabled = true;
+      placeholderOpt.selected = true;
+      select.appendChild(placeholderOpt);
+
+      state.members.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = m;
+        select.appendChild(opt);
+      });
+    }
+
+    // Handle Login Process
+    function handleLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('loginUserSelect').value;
+      const pin = document.getElementById('loginPinInput').value;
+
+      if (!user) {
+        alert('본인의 이름을 목록에서 선택해 주세요.');
+        return;
+      }
+
+      if (state.passwords[user] === pin) {
+        playBeep();
+        state.currentUser = user;
+        
+        // Hide Login, Show Dashboard
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('mainDashboard').classList.remove('hidden');
+        document.getElementById('mainDashboard').classList.remove('hidden');
+        document.getElementById('mainDashboard').classList.add('flex');
+
+        updateUserBadge();
+        setupDropdowns();
+        switchTab('jar');
+      } else {
+        alert('비밀번호가 올바르지 않습니다. (초기 비밀번호: 0000)');
+      }
+    }
+
+    function handleLogout() {
+      playBeep();
+      state.currentUser = null;
+      document.getElementById('mainDashboard').classList.add('hidden');
+      document.getElementById('mainDashboard').classList.remove('flex');
+      document.getElementById('loginScreen').classList.remove('hidden');
+      document.getElementById('loginPinInput').value = '';
+      populateLoginDropdown();
+    }
+
+    function updateUserBadge() {
+      document.getElementById('currentUserName').textContent = state.currentUser;
+      document.getElementById('currentUserAvatar').textContent = state.currentUser.charAt(0);
+
+      // Check Admin Permission (김사라, 조제민)
+      const adminBtn = document.getElementById('adminMemberBtn');
+      if (ADMIN_USERS.includes(state.currentUser)) {
+        adminBtn.classList.remove('hidden');
+      } else {
+        adminBtn.classList.add('hidden');
+      }
+    }
+
+    function setupDropdowns() {
+      // Gratitude Target Dropdown
+      const jarTarget = document.getElementById('jarTargetUser');
+      jarTarget.innerHTML = '<option value="전체">전체 대상</option>';
+      state.members.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = m;
+        jarTarget.appendChild(opt);
+      });
+
+      // Counseling Target Dropdown (All 16 Members)
+      const counselTarget = document.getElementById('counselTargetSelect');
+      counselTarget.innerHTML = '';
+      state.members.forEach(m => {
+        if (m !== state.currentUser) {
+          const opt = document.createElement('option');
+          opt.value = m;
+          opt.textContent = m;
+          counselTarget.appendChild(opt);
+        }
+      });
+    }
+
+    // Switch Main Tabs
+    function switchTab(tabId) {
+      playBeep();
+      state.currentTab = tabId;
+
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-jeju-orange', 'text-white', 'shadow-md');
+        btn.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+      });
+
+      document.getElementById(`tabContent-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tabBtn-${tabId}`);
+      activeBtn.classList.remove('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+      activeBtn.classList.add('bg-jeju-orange', 'text-white', 'shadow-md');
+
+      // Render tab specifics
+      if (tabId === 'jar') renderJarTab();
+      if (tabId === 'members') renderMemberCards();
+      if (tabId === 'manitto') renderManittoTab();
+      if (tabId === 'forum') renderForumTab();
+      if (tabId === 'counsel') renderCounselTab();
+    }
+
+
+    // ================= TAB 1: 감사항아리 LOGIC =================
+    function renderJarTab() {
+      // Render Glass Jar Animated Marbles
+      const jarGraphic = document.getElementById('jarGraphic');
+      jarGraphic.innerHTML = '';
+
+      state.gratitudeJar.forEach(item => {
+        const marble = document.createElement('div');
+        marble.className = 'w-7 h-7 rounded-full shadow-md border border-white/40 flex items-center justify-center text-[10px] text-white font-bold marble-anim cursor-pointer hover:scale-125 transition';
+        
+        let colorClass = 'bg-orange-500';
+        if (item.category === '팀원 전체') colorClass = 'bg-blue-500';
+        if (item.category === '팀원 개인') colorClass = 'bg-pink-500';
+        if (item.category === '일상') colorClass = 'bg-emerald-500';
+
+        marble.classList.add(colorClass);
+        marble.textContent = item.sender.charAt(0);
+        marble.title = `${item.sender}: ${item.text}`;
+        jarGraphic.appendChild(marble);
+      });
+
+      // Update Counts
+      document.getElementById('jarCountTotal').textContent = state.gratitudeJar.length;
+      document.getElementById('jarCountMy').textContent = state.gratitudeJar.filter(i => i.sender === state.currentUser).length;
+
+      // Render Feed List
+      const feedList = document.getElementById('jarFeedList');
+      feedList.innerHTML = '';
+
+      [...state.gratitudeJar].reverse().forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'bg-gray-50 rounded-xl p-4 border border-gray-200 space-y-2';
+
+        let badgeColor = 'bg-orange-100 text-orange-700';
+        if (item.category === '팀원 전체') badgeColor = 'bg-blue-100 text-blue-700';
+        if (item.category === '팀원 개인') badgeColor = 'bg-pink-100 text-pink-700';
+        if (item.category === '일상') badgeColor = 'bg-emerald-100 text-emerald-700';
+
+        card.innerHTML = `
+          <div class="flex justify-between items-center text-xs">
+            <div class="flex items-center gap-2">
+              <span class="${badgeColor} px-2 py-0.5 rounded-full font-bold">${item.category}</span>
+              <span class="font-bold text-gray-800">${item.sender} ➔ ${item.target}</span>
+            </div>
+            <span class="text-gray-400">${item.date}</span>
+          </div>
+          <p class="text-sm text-gray-700 leading-relaxed">${escapeHtml(item.text)}</p>
+          ${item.photo ? `<img src="${item.photo}" class="w-full max-h-48 object-cover rounded-lg mt-2 border">` : ''}
+        `;
+        feedList.appendChild(card);
+      });
+    }
+
+    function previewJarImage(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          state.tempJarPhoto = e.target.result;
+          document.getElementById('jarImgTag').src = e.target.result;
+          document.getElementById('jarImagePreview').classList.remove('hidden');
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function removeJarImage() {
+      state.tempJarPhoto = null;
+      document.getElementById('jarPhotoInput').value = '';
+      document.getElementById('jarImagePreview').classList.add('hidden');
+    }
+
+    function handleAddJarMsg(e) {
+      e.preventDefault();
+      const category = document.getElementById('jarCategory').value;
+      const target = document.getElementById('jarTargetUser').value;
+      const text = document.getElementById('jarText').value;
+
+      const newMsg = {
+        id: Date.now(),
+        sender: state.currentUser,
+        category,
+        target,
+        text,
+        photo: state.tempJarPhoto || '',
+        date: new Date().toISOString().split('T')[0].replace(/-/g, '.')
+      };
+
+      state.gratitudeJar.push(newMsg);
+      saveState();
+
+      // Trigger Confetti effect
+      confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+
+      document.getElementById('jarText').value = '';
+      removeJarImage();
+      renderJarTab();
+    }
+
+
+    // ================= TAB 2: 팀원 자기소개 LOGIC =================
+    function renderMemberCards() {
+      const search = (document.getElementById('memberSearchInput').value || '').toLowerCase();
+      const grid = document.getElementById('memberGrid');
+      grid.innerHTML = '';
+
+      document.getElementById('memberCountHeader').textContent = state.members.length;
+
+      state.members.forEach(m => {
+        const prof = state.profiles[m] || {};
+        if (search && !m.toLowerCase().includes(search) && !(prof.mbti || '').toLowerCase().includes(search)) {
+          return;
+        }
+
+        const isMe = m === state.currentUser;
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition';
+
+        // Music Youtube Query URL
+        const songQuery = encodeURIComponent(prof.song || '제주항공');
+        const songUrl = `https://www.youtube.com/results?search_query=${songQuery}`;
+
+        // Dynamic Custom Fields HTML
+        let customFieldsHtml = '';
+        if (prof.customFields && Array.isArray(prof.customFields)) {
+          prof.customFields.forEach(cf => {
+            if (cf.title && cf.value) {
+              customFieldsHtml += `
+                <div class="flex items-start gap-2 text-xs text-gray-600">
+                  <i data-lucide="sparkles" class="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5"></i>
+                  <span class="font-semibold text-gray-700 flex-shrink-0">${escapeHtml(cf.title)}:</span>
+                  <span class="text-gray-600">${escapeHtml(cf.value)}</span>
+                </div>
+              `;
+            }
+          });
+        }
+
+        card.innerHTML = `
+          <div>
+            <div class="bg-gradient-to-r from-orange-400 to-amber-500 h-10 relative p-2 px-3 flex justify-between items-center">
+              <span class="bg-black/20 text-white text-[11px] font-bold px-2 py-0.5 rounded-full">${prof.mbti || 'MBTI'}</span>
+              ${isMe ? `<button onclick="openEditProfileModal()" class="bg-white text-jeju-orange font-bold text-xs px-2.5 py-0.5 rounded-full shadow hover:bg-orange-50">수정하기</button>` : ''}
+            </div>
+
+            <div class="px-5 pb-4 -mt-6 flex flex-col items-center text-center">
+              <div class="w-20 h-20 rounded-full border-4 border-white shadow-md overflow-hidden bg-gray-200 flex items-center justify-center font-bold text-2xl text-gray-600 mb-2">
+                ${prof.photo ? `<img src="${prof.photo}" class="w-full h-full object-cover">` : m.charAt(0)}
+              </div>
+
+              <h3 class="text-base font-extrabold text-gray-800">${m}</h3>
+              ${prof.age ? `<p class="text-xs text-gray-500 font-medium mt-0.5">나이: ${escapeHtml(prof.age)}세</p>` : ''}
+
+              <div class="w-full border-t border-gray-100 my-3"></div>
+
+              <div class="w-full space-y-2 text-left text-xs text-gray-600">
+                ${prof.hometown ? `
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="map-pin" class="w-4 h-4 text-orange-500 flex-shrink-0"></i>
+                    <span class="font-semibold text-gray-700">고향:</span>
+                    <span>${escapeHtml(prof.hometown)}</span>
+                  </div>
+                ` : ''}
+
+                ${prof.residence ? `
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="home" class="w-4 h-4 text-amber-500 flex-shrink-0"></i>
+                    <span class="font-semibold text-gray-700">거주지:</span>
+                    <span>${escapeHtml(prof.residence)}</span>
+                  </div>
+                ` : ''}
+
+                ${prof.food ? `
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="utensils" class="w-4 h-4 text-red-500 flex-shrink-0"></i>
+                    <span class="font-semibold text-gray-700">좋아하는 음식:</span>
+                    <span class="truncate">${escapeHtml(prof.food)}</span>
+                  </div>
+                ` : ''}
+
+                ${prof.preciousPerson ? `
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="heart" class="w-4 h-4 text-pink-500 flex-shrink-0"></i>
+                    <span class="font-semibold text-gray-700">소중한 사람:</span>
+                    <span class="truncate">${escapeHtml(prof.preciousPerson)}</span>
+                  </div>
+                ` : ''}
+
+                ${prof.bookQuote ? `
+                  <div class="flex items-start gap-2">
+                    <i data-lucide="book-open" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"></i>
+                    <span class="font-semibold text-gray-700 flex-shrink-0">책/문구:</span>
+                    <span class="italic text-gray-600">${escapeHtml(prof.bookQuote)}</span>
+                  </div>
+                ` : ''}
+
+                ${prof.song ? `
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="music" class="w-4 h-4 text-indigo-500 flex-shrink-0"></i>
+                    <span class="font-semibold text-gray-700">추천곡:</span>
+                    <a href="${songUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium truncate flex-1" title="유튜브에서 듣기">
+                      ${escapeHtml(prof.song)} ↗
+                    </a>
+                  </div>
+                ` : ''}
+
+                ${prof.wishToTeam ? `
+                  <div class="flex items-start gap-2 bg-orange-50/60 p-2 rounded-lg border border-orange-100">
+                    <i data-lucide="message-circle" class="w-4 h-4 text-jeju-orange flex-shrink-0 mt-0.5"></i>
+                    <div>
+                      <span class="font-semibold text-orange-800 block">훈련팀에 바라는 점:</span>
+                      <span class="text-gray-700">${escapeHtml(prof.wishToTeam)}</span>
+                    </div>
+                  </div>
+                ` : ''}
+
+                ${customFieldsHtml}
+              </div>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    function addCustomFieldInput(title = '', value = '') {
+      const container = document.getElementById('customFieldsContainer');
+      const div = document.createElement('div');
+      div.className = 'custom-field-row flex gap-2 items-center';
+      div.innerHTML = `
+        <input type="text" placeholder="질문 항목 (예: 취미)" value="${escapeHtml(title)}" class="custom-title text-xs border border-gray-300 rounded-lg p-2 w-1/3">
+        <input type="text" placeholder="답변 내용" value="${escapeHtml(value)}" class="custom-value text-xs border border-gray-300 rounded-lg p-2 flex-1">
+        <button type="button" onclick="this.parentElement.remove()" class="text-gray-400 hover:text-red-500 p-1"><i data-lucide="x-circle" class="w-4 h-4"></i></button>
+      `;
+      container.appendChild(div);
+      lucide.createIcons();
+    }
+
+    function openEditProfileModal() {
+      const p = state.profiles[state.currentUser] || {};
+      document.getElementById('editAge').value = p.age || '';
+      document.getElementById('editMbti').value = p.mbti || '';
+      document.getElementById('editHometown').value = p.hometown || '';
+      document.getElementById('editResidence').value = p.residence || '';
+      document.getElementById('editFood').value = p.food || '';
+      document.getElementById('editPreciousPerson').value = p.preciousPerson || '';
+      document.getElementById('editBookQuote').value = p.bookQuote || '';
+      document.getElementById('editSong').value = p.song || '';
+      document.getElementById('editWishToTeam').value = p.wishToTeam || '';
+
+      const container = document.getElementById('customFieldsContainer');
+      container.innerHTML = '';
+      if (p.customFields && Array.isArray(p.customFields)) {
+        p.customFields.forEach(cf => addCustomFieldInput(cf.title, cf.value));
+      }
+
+      document.getElementById('editProfileModal').classList.remove('hidden');
+    }
+
+    function closeEditProfileModal() {
+      document.getElementById('editProfileModal').classList.add('hidden');
+    }
+
+    function handleSaveProfile(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('editProfilePicInput');
+      
+      const customRows = document.querySelectorAll('.custom-field-row');
+      const customFields = [];
+      customRows.forEach(row => {
+        const title = row.querySelector('.custom-title').value.trim();
+        const value = row.querySelector('.custom-value').value.trim();
+        if (title && value) {
+          customFields.push({ title, value });
+        }
+      });
+
+      const save = (photoUrl) => {
+        state.profiles[state.currentUser] = {
+          age: document.getElementById('editAge').value.trim(),
+          mbti: document.getElementById('editMbti').value.trim(),
+          hometown: document.getElementById('editHometown').value.trim(),
+          residence: document.getElementById('editResidence').value.trim(),
+          food: document.getElementById('editFood').value.trim(),
+          preciousPerson: document.getElementById('editPreciousPerson').value.trim(),
+          bookQuote: document.getElementById('editBookQuote').value.trim(),
+          song: document.getElementById('editSong').value.trim(),
+          wishToTeam: document.getElementById('editWishToTeam').value.trim(),
+          customFields,
+          photo: photoUrl || (state.profiles[state.currentUser] ? state.profiles[state.currentUser].photo : '')
+        };
+        saveState();
+        closeEditProfileModal();
+        renderMemberCards();
+      };
+
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => save(e.target.result);
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        save();
+      }
+    }
+
+
+    // ================= TAB 3: 비밀 마니또 LOGIC =================
+    function renderManittoTab() {
+      document.getElementById('myManittoTargetName').textContent = '???';
+      document.getElementById('revealBtn').classList.remove('hidden');
+
+      // Inbox for messages sent TO me
+      const inbox = document.getElementById('manittoInboxList');
+      inbox.innerHTML = '';
+
+      const myMsgs = state.manittoMsgs.filter(m => m.target === state.currentUser);
+      if (myMsgs.length === 0) {
+        inbox.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">아직 수호천사의 메시지가 도착하지 않았습니다.</p>';
+      } else {
+        [...myMsgs].reverse().forEach(m => {
+          const card = document.createElement('div');
+          card.className = 'bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 space-y-1';
+          card.innerHTML = `
+            <div class="flex justify-between font-bold text-amber-700">
+              <span>🎁 내 비밀 마니또로부터</span>
+              <span class="text-gray-400 font-normal">${m.date}</span>
+            </div>
+            <p class="leading-relaxed">${escapeHtml(m.text)}</p>
+          `;
+          inbox.appendChild(card);
+        });
+      }
+
+      // Render Photo Gallery (훈훈한 순간 📸)
+      const gallery = document.getElementById('manittoPhotoGallery');
+      gallery.innerHTML = '';
+
+      if (state.manittoPhotos.length === 0) {
+        gallery.innerHTML = '<p class="text-xs text-gray-400 col-span-2 text-center py-8">등록된 칭찬 사진이 없습니다.</p>';
+      } else {
+        [...state.manittoPhotos].reverse().forEach(p => {
+          const item = document.createElement('div');
+          item.className = 'bg-gray-50 rounded-xl overflow-hidden border border-gray-200 shadow-sm flex flex-col';
+          item.innerHTML = `
+            <img src="${p.photo}" class="w-full h-32 object-cover">
+            <div class="p-2 text-xs">
+              <p class="font-semibold text-gray-800 truncate">${escapeHtml(p.caption)}</p>
+              <span class="text-[10px] text-gray-400">${p.sender} • ${p.date}</span>
+            </div>
+          `;
+          gallery.appendChild(item);
+        });
+      }
+    }
+
+    function revealMyManittoTarget() {
+      const target = state.manittoPairs[state.currentUser] || '미정';
+      document.getElementById('myManittoTargetName').textContent = target;
+      document.getElementById('revealBtn').classList.add('hidden');
+    }
+
+    function handleSendManittoMsg(e) {
+      e.preventDefault();
+      const target = state.manittoPairs[state.currentUser];
+      const text = document.getElementById('manittoMsgInput').value;
+
+      state.manittoMsgs.push({
+        id: Date.now(),
+        sender: state.currentUser,
+        target,
+        text,
+        date: new Date().toISOString().split('T')[0].replace(/-/g, '.')
+      });
+
+      saveState();
+      alert(`내 마니또(${target})에게 비밀 응원 메시지를 전달했습니다!`);
+      document.getElementById('manittoMsgInput').value = '';
+      renderManittoTab();
+    }
+
+    function openManittoPhotoModal() {
+      document.getElementById('manittoPhotoModal').classList.remove('hidden');
+    }
+    function closeManittoPhotoModal() {
+      document.getElementById('manittoPhotoModal').classList.add('hidden');
+    }
+
+    function handleAddManittoPhoto(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('manittoPhotoFileInput');
+      const caption = document.getElementById('manittoPhotoCaption').value;
+
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          state.manittoPhotos.push({
+            id: Date.now(),
+            sender: state.currentUser,
+            photo: evt.target.result,
+            caption,
+            date: new Date().toISOString().split('T')[0].replace(/-/g, '.')
+          });
+          saveState();
+          closeManittoPhotoModal();
+          document.getElementById('manittoPhotoCaption').value = '';
+          renderManittoTab();
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      }
+    }
+
+
+    // ================= TAB 4: 자유 익명게시판 LOGIC =================
+    function renderForumTab() {
+      const list = document.getElementById('forumPostList');
+      list.innerHTML = '';
+
+      if (state.forumPosts.length === 0) {
+        list.innerHTML = '<p class="text-xs text-gray-400 text-center py-6">첫 게시글을 남겨보세요!</p>';
+        return;
+      }
+
+      [...state.forumPosts].reverse().forEach(post => {
+        const card = document.createElement('div');
+        card.className = 'bg-gray-50 rounded-xl p-5 border border-gray-200 space-y-3';
+
+        card.innerHTML = `
+          <div class="flex justify-between items-start">
+            <h4 class="text-sm font-bold text-gray-800">${escapeHtml(post.title)}</h4>
+            <span class="text-xs text-gray-400">${post.date}</span>
+          </div>
+          <p class="text-xs text-gray-700 leading-relaxed">${escapeHtml(post.content)}</p>
+
+          <div class="flex items-center justify-between border-t border-gray-200/60 pt-3">
+            <button onclick="likeForumPost(${post.id})" class="text-xs text-pink-600 font-semibold flex items-center gap-1 hover:scale-105 transition">
+              <i data-lucide="heart" class="w-3.5 h-3.5 fill-pink-500"></i> 좋아요 ${post.likes || 0}
+            </button>
+            <span class="text-xs text-gray-400">익명 작성자</span>
+          </div>
+
+          <!-- Comments Container -->
+          <div class="bg-white rounded-lg p-3 border border-gray-100 space-y-2 mt-2">
+            <div class="space-y-1.5 max-h-32 overflow-y-auto text-xs">
+              ${(post.comments || []).map(c => `
+                <div class="bg-gray-50 p-2 rounded border border-gray-100">
+                  <span class="font-bold text-gray-600">익명:</span> ${escapeHtml(c.text)}
+                </div>
+              `).join('')}
+            </div>
+
+            <form onsubmit="handleAddForumComment(event, ${post.id})" class="flex gap-2 pt-2">
+              <input type="text" placeholder="익명 댓글 작성..." required class="flex-1 text-xs border border-gray-200 rounded-md p-1.5 outline-none focus:ring-1 focus:ring-orange-500">
+              <button type="submit" class="bg-gray-800 text-white text-xs px-3 py-1.5 rounded-md">등록</button>
+            </form>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    function handleCreateForumPost(e) {
+      e.preventDefault();
+      const title = document.getElementById('forumTitleInput').value;
+      const content = document.getElementById('forumContentInput').value;
+
+      state.forumPosts.push({
+        id: Date.now(),
+        title,
+        content,
+        likes: 0,
+        comments: [],
+        date: new Date().toISOString().split('T')[0].replace(/-/g, '.')
+      });
+
+      saveState();
+      document.getElementById('forumTitleInput').value = '';
+      document.getElementById('forumContentInput').value = '';
+      renderForumTab();
+    }
+
+    function likeForumPost(postId) {
+      const p = state.forumPosts.find(x => x.id === postId);
+      if (p) {
+        p.likes = (p.likes || 0) + 1;
+        saveState();
+        renderForumTab();
+      }
+    }
+
+    function handleAddForumComment(e, postId) {
+      e.preventDefault();
+      const input = e.target.querySelector('input');
+      const text = input.value;
+      const p = state.forumPosts.find(x => x.id === postId);
+
+      if (p) {
+        if (!p.comments) p.comments = [];
+        p.comments.push({ text, date: new Date().toISOString().split('T')[0].replace(/-/g, '.') });
+        saveState();
+        renderForumTab();
+      }
+    }
+
+
+    // ================= TAB 5: 비밀 고민상담소 LOGIC =================
+    function renderCounselTab() {
+      const inbox = document.getElementById('counselInboxList');
+      inbox.innerHTML = '';
+
+      // Messages sent TO me
+      const myMsgs = state.counselMsgs.filter(c => c.target === state.currentUser);
+
+      if (myMsgs.length === 0) {
+        inbox.innerHTML = '<p class="text-xs text-gray-400 text-center py-6">도착한 비밀 고민 메시지가 없습니다.</p>';
+      } else {
+        [...myMsgs].reverse().forEach(c => {
+          const card = document.createElement('div');
+          card.className = 'bg-white rounded-lg p-3 border border-emerald-200 shadow-sm text-xs space-y-1';
+          card.innerHTML = `
+            <div class="flex justify-between text-emerald-700 font-bold">
+              <span>🔒 익명의 고민 상담</span>
+              <span class="text-gray-400 font-normal">${c.date}</span>
+            </div>
+            <p class="text-gray-700 leading-relaxed">${escapeHtml(c.text)}</p>
+          `;
+          inbox.appendChild(card);
+        });
+      }
+    }
+
+    function handleSendCounsel(e) {
+      e.preventDefault();
+      const target = document.getElementById('counselTargetSelect').value;
+      const text = document.getElementById('counselTextInput').value;
+
+      state.counselMsgs.push({
+        id: Date.now(),
+        sender: state.currentUser,
+        target,
+        text,
+        date: new Date().toISOString().split('T')[0].replace(/-/g, '.')
+      });
+
+      saveState();
+      alert(`${target}님에게 암호화 비밀 고민 상담 메시지를 전달했습니다.`);
+      document.getElementById('counselTextInput').value = '';
+      renderCounselTab();
+    }
+
+
+    // ================= MODALS & ADMIN MANAGEMENT =================
+    function openPasswordModal() {
+      document.getElementById('passwordModal').classList.remove('hidden');
+    }
+    function closePasswordModal() {
+      document.getElementById('passwordModal').classList.add('hidden');
+    }
+
+    function handleChangePassword(e) {
+      e.preventDefault();
+      const curr = document.getElementById('currPinInput').value;
+      const next = document.getElementById('newPinInput').value;
+
+      if (state.passwords[state.currentUser] === curr) {
+        state.passwords[state.currentUser] = next;
+        saveState();
+        alert('비밀번호가 성공적으로 변경되었습니다!');
+        closePasswordModal();
+      } else {
+        alert('현재 비밀번호가 일치하지 않습니다.');
+      }
+    }
+
+    function openAdminModal() {
+      renderAdminMemberList();
+      document.getElementById('adminModal').classList.remove('hidden');
+    }
+    function closeAdminModal() {
+      document.getElementById('adminModal').classList.add('hidden');
+    }
+
+    function renderAdminMemberList() {
+      const list = document.getElementById('adminMemberList');
+      list.innerHTML = '';
+
+      state.members.forEach(m => {
+        const item = document.createElement('div');
+        item.className = 'flex justify-between items-center bg-gray-50 p-2 rounded text-xs';
+        item.innerHTML = `
+          <span class="font-bold text-gray-700">${m}</span>
+          ${ADMIN_USERS.includes(m) ? `<span class="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded font-bold">관리자</span>` : `
+            <button onclick="handleDeleteMember('${m}')" class="text-red-500 hover:text-red-700 font-bold">삭제</button>
+          `}
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function handleAddMember(e) {
+      e.preventDefault();
+      const name = document.getElementById('newMemberNameInput').value.trim();
+      if (!name) return;
+
+      if (state.members.includes(name)) {
+        alert('이미 존재하는 팀원 이름입니다.');
+        return;
+      }
+
+      state.members.push(name);
+      state.passwords[name] = "0000";
+      generateManittoPairs();
+      saveState();
+
+      document.getElementById('newMemberNameInput').value = '';
+      renderAdminMemberList();
+      setupDropdowns();
+      populateLoginDropdown();
+    }
+
+    function handleDeleteMember(name) {
+      if (confirm(`${name} 팀원을 명단에서 삭제하시겠습니까?`)) {
+        state.members = state.members.filter(m => m !== name);
+        delete state.passwords[name];
+        generateManittoPairs();
+        saveState();
+
+        renderAdminMemberList();
+        setupDropdowns();
+        populateLoginDropdown();
+      }
+    }
+
+    // Helper Utility
+    function escapeHtml(str) {
+      return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // Initialize App
+    window.addEventListener('DOMContentLoaded', () => {
+      initData();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
